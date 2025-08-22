@@ -1,16 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fira+Code:wght@300..700&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Oxanium:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Weather App - Indian Cities</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Roboto',sans-serif; }
+body {
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(to top, #4facfe, #00f2fe);
+  transition: background 0.5s ease;
+  color:#fff;
+  overflow:hidden;
+}
+
+.container {
+  background: rgba(255,255,255,0.12);
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+  max-width:400px;
+  width:100%;
+  text-align:center;
+  position: relative;
+  z-index: 10;
+}
+
+h1 { margin-bottom:20px; font-size:2rem; text-shadow: 0 0 5px rgba(0,0,0,0.3); }
+input { padding:10px 15px; border-radius:10px; border:none; outline:none; width:65%; margin-bottom:10px; font-size:1rem;}
+button { padding:10px 20px; border:none; border-radius:10px; background-color:#ffd700; color:#000; font-weight:bold; cursor:pointer; transition:0.3s;}
+button:hover { background-color:#ffc107; }
+
+.weather-card {
+  margin-top:20px;
+  background: rgba(255,255,255,0.18);
+  padding:20px;
+  border-radius:15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+.weather-card img { width:80px; margin-bottom:10px; }
+.weather-card p { margin:5px 0; }
+
+/* CLOUDS */
+.clouds { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+.cloud { position:absolute; background: rgba(255,255,255,0.5); border-radius:50%; width:100px; height:60px; filter: blur(8px); animation: moveClouds linear infinite; }
+@keyframes moveClouds { 0%{transform: translateX(-150px);} 100%{transform: translateX(110vw);} }
+
+/* RAIN */
+.rain { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+.rain-drop {
+  position:absolute;
+  width:2px;
+  height:15px;
+  background: rgba(255,255,255,0.6);
+  border-radius:50%;
+  transform: rotate(10deg);
+  animation: fall linear infinite;
+}
+@keyframes fall { 0%{top:-20px;} 100%{top:110vh;} }
+
+/* SNOW */
+.snowflake { position:absolute; width:6px; height:6px; background:white; border-radius:50%; opacity:0.8; animation: fallSnow linear infinite; }
+@keyframes fallSnow { 0%{top:-10px;} 100%{top:110vh;} }
+
+/* SUN */
+.sun { width:100px; height:100px; border-radius:50%; background:yellow; position:absolute; top:50px; right:50px; box-shadow: 0 0 50px 25px yellow; animation: rotateSun 15s linear infinite; }
+@keyframes rotateSun { 0%{transform: rotate(0deg);} 100%{transform: rotate(360deg);} }
+
+/* LIGHTNING */
+.flash { position:absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; z-index:9; pointer-events:none; animation: flashAnim 0.2s linear; }
+@keyframes flashAnim { 0%{opacity:0;} 50%{opacity:0.8;} 100%{opacity:0;} }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Premium Indian Weather</h1>
+<input type="text" id="cityInput" placeholder="Enter city name">
+<button onclick="getWeather()">Get Weather</button>
+
+<div id="weatherResult" class="weather-card" style="display:none;">
+  <h2 id="cityName"></h2>
+  <img id="weatherIcon" src="" alt="Weather Icon">
+  <p id="description"></p>
+  <p id="temperature"></p>
+  <p id="humidity"></p>
+  <p id="wind"></p>
+</div>
+</div>
+
+<!-- Animations containers -->
+<div class="clouds" id="clouds"></div>
+<div class="rain" id="rain"></div>
+<div class="snow" id="snow"></div>
+<div class="sun" id="sun"></div>
+<div id="flashContainer"></div>
+
+<!-- Sounds -->
+<audio id="rainSound" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_aa9c1c3d3b.mp3?filename=rain-loop-ambient-110014.mp3"></audio>
+<audio id="thunderSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_96164f7993.mp3?filename=thunder-01-11888.mp3"></audio>
+
+<script>
+// ---------- ANIMATION FUNCTIONS ----------
+function clearAnimations() {
+  document.getElementById('clouds').innerHTML='';
+  document.getElementById('rain').innerHTML='';
+  document.getElementById('snow').innerHTML='';
+  document.getElementById('sun').style.display='none';
+  document.getElementById('flashContainer').innerHTML='';
+  document.getElementById('rainSound').pause();
+  document.getElementById('rainSound').currentTime=0;
+  document.getElementById('thunderSound').pause();
+  document.getElementById('thunderSound').currentTime=0;
+}
+
+function createClouds() {
+  const clouds = document.getElementById('clouds');
+  for(let i=0;i<4;i++){
+    const cloud = document.createElement('div');
+    cloud.className='cloud';
+    cloud.style.top = `${20 + i*50}px`;
+    cloud.style.width = `${80 + Math.random()*60}px`;
+    cloud.style.height = `${50 + Math.random()*40}px`;
+    cloud.style.animationDuration = `${25 + Math.random()*20}s`;
+    clouds.appendChild(cloud);
+  }
+}
+
+function createRain() {
+  const rain = document.getElementById('rain');
+  for(let i=0;i<50;i++){
+    const drop = document.createElement('div');
+    drop.className='rain-drop';
+    drop.style.left = `${Math.random()*100}%`;
+    drop.style.height = `${10 + Math.random()*20}px`;
+    drop.style.opacity = `${0.3 + Math.random()*0.7}`;
+    drop.style.animationDuration = `${0.5 + Math.random()*0.7}s`;
+    rain.appendChild(drop);
+  }
+  document.getElementById('rainSound').volume = 0.4;
+  document.getElementById('rainSound').play();
+}
+
+function createSnow() {
+  const snow = document.getElementById('snow');
+  for(let i=0;i<30;i++){
+    const flake = document.createElement('div');
+    flake.className='snowflake';
+    flake.style.left = `${Math.random()*100}%`;
+    flake.style.animationDuration = `${5 + Math.random()*5}s`;
+    snow.appendChild(flake);
+  }
+}
+
+function createThunder() {
+  createClouds();
+  createRain();
+  function flashLightning(){
+    const flash = document.createElement('div');
+    flash.className='flash';
+    document.getElementById('flashContainer').appendChild(flash);
+    setTimeout(()=>flash.remove(),200);
+    setTimeout(()=>document.getElementById('thunderSound').play(), 300);
+  }
+  flashLightning();
+  setInterval(flashLightning, 4000 + Math.random()*4000);
+}
+
+// ---------- FETCH WEATHER ----------
+async function getWeather() {
+  const city = document.getElementById('cityInput').value.trim();
+  if(!city) return alert('Enter city name');
+
+  const apiKey = "9d9c78cee08348369ad61750252208"; // API KEY
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)},IN&appid=${apiKey}&units=metric`;
+
+  try {
+    const response = await fetch(url);
+    if(!response.ok) throw new Error("City not found");
+    const data = await response.json();
+
+    // Update weather card
+    document.getElementById('weatherResult').style.display='block';
+    document.getElementById('cityName').innerText = data.name;
+    document.getElementById('description').innerText = data.weather[0].description.toUpperCase();
+    document.getElementById('temperature').innerText = `Temperature: ${data.main.temp}°C`;
+    document.getElementById('humidity').innerText = `Humidity: ${data.main.humidity}%`;
+    document.getElementById('wind').innerText = `Wind: ${data.wind.speed} m/s`;
+    document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+    // Clear previous animations
+    clearAnimations();
+
+    // Set background & animations based on weather
+    const weatherMain = data.weather[0].main.toLowerCase();
+    let bg = 'linear-gradient(to top,#4facfe,#00f2fe)';
+
+    if(weatherMain.includes('clear')) {
+      bg='linear-gradient(to top,#fceabb,#f8b500)';
+      document.getElementById('sun').style.display='block';
+    } else if(weatherMain.includes('cloud')) {
+      bg='linear-gradient(to top,#bdc3c7,#2c3e50)';
+      createClouds();
+    } else if(weatherMain.includes('rain')) {
+      bg='linear-gradient(to top,#4b79a1,#283e51)';
+      createRain(); createClouds();
+    } else if(weatherMain.includes('snow')) {
+      bg='linear-gradient(to top,#83a4d4,#b6fbff)';
+      createSnow(); createClouds();
+    } else if(weatherMain.includes('storm') || weatherMain.includes('thunder')) {
+      bg='linear-gradient(to top,#373b44,#4286f4)';
+      createThunder();
+    }
+
+    document.body.style.background=bg;
+
+  } catch(err) {
+    alert(err.message);
+  }
+}
+</script>
+</body>
 </html>

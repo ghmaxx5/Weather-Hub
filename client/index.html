@@ -1,23 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modern Web Template - Premium Landing Page</title>
-    <meta name="description" content="A clean, responsive, and modern web template with semantic structure, CSS Grid, Flexbox, and interactive React components." />
-    
-    <!-- Open Graph tags for social media sharing -->
-    <meta property="og:title" content="Modern Web Template - Premium Landing Page" />
-    <meta property="og:description" content="A clean, responsive, and modern web template with semantic structure, CSS Grid, Flexbox, and interactive React components." />
-    <meta property="og:type" content="website" />
-    
-    <!-- Preconnect to external domains for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Weather Hub — MAX TECH</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Roboto',sans-serif;}
+body { min-height:100vh; display:flex; justify-content:center; align-items:center; background: linear-gradient(to top, #4facfe,#00f2fe); transition: background 0.5s; color:#fff; overflow:hidden;}
+.container { background: rgba(255,255,255,0.12); padding:30px; border-radius:20px; box-shadow:0 8px 25px rgba(0,0,0,0.35); max-width:400px; width:90%; text-align:center; position: relative; z-index:10;}
+h1 { margin-bottom:20px; font-size:2rem; text-shadow: 0 0 5px rgba(0,0,0,0.3);}
+input { padding:10px 15px; border-radius:10px; border:none; outline:none; width:90%; font-size:1rem;}
+#searchBtn { padding:10px 20px; margin-top:10px; border:none; border-radius:10px; background-color:#ffd700; color:#000; font-weight:bold; cursor:pointer; transition:0.3s;}
+#searchBtn:hover { background-color:#ffc107; }
+.weather-card { margin-top:20px; background: rgba(255,255,255,0.18); padding:20px; border-radius:15px; box-shadow: 0 0 10px rgba(0,0,0,0.2);}
+.weather-card p { margin:5px 0;}
+#suggestions { position: absolute; top:45px; width:90%; background: rgba(255,255,255,0.2); border-radius:10px; max-height:150px; overflow-y:auto; display:none; z-index:20;}
+#suggestions div { padding:10px; cursor:pointer; transition:0.2s;}
+#suggestions div:hover { background: rgba(255,255,255,0.4); font-weight:bold; }
+
+.clouds { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;}
+.cloud { position:absolute; background: rgba(255,255,255,0.5); border-radius:50%; width:100px; height:60px; filter: blur(6px); animation: moveClouds linear infinite;}
+@keyframes moveClouds { 0%{transform: translateX(-150px);} 100%{transform: translateX(110vw);} }
+
+.rain { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+.rain-drop { position:absolute; width:2px; height:15px; background: rgba(255,255,255,0.6); border-radius:50%; transform: translateY(-100vh); animation: fall linear infinite; }
+@keyframes fall { 0%{transform: translateY(-100vh);} 100%{transform: translateY(110vh);} }
+
+.sun { width:100px; height:100px; border-radius:50%; background:yellow; position:absolute; top:50px; right:50px; box-shadow: 0 0 50px 25px yellow; animation: rotateSun 15s linear infinite;}
+@keyframes rotateSun { 0%{transform: rotate(0deg);} 100%{transform: rotate(360deg);} }
+
+#flash { position:absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; z-index:9; pointer-events:none; transition:opacity 0.25s ease;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Weather Hub</h1>
+  <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <input type="text" id="cityInput" placeholder="Enter Indian city" autocomplete="off">
+    <div id="suggestions"></div>
+    <button id="searchBtn" onclick="getWeather()">Search</button>
+  </div>
+
+  <div id="weatherResult" class="weather-card" style="display:none;">
+    <h2 id="cityName"></h2>
+    <p id="description"></p>
+    <p id="temperature"></p>
+    <p id="wind"></p>
+  </div>
+</div>
+
+<div class="clouds" id="clouds"></div>
+<div class="rain" id="rain"></div>
+<div class="sun" id="sun"></div>
+<div id="flash"></div>
+
+<script>
+// ---------- AUDIO ----------
+let audioCtx=null, rainNode=null, rainGain=null;
+
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+  const buf=audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
+  const data=buf.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*0.2;
+
+  const src=audioCtx.createBufferSource(); src.buffer=buf; src.loop=true;
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1500;
+  rainGain=audioCtx.createGain(); rainGain.gain.value=0.15;
+  src.connect(lp).connect(rainGain).connect(audioCtx.destination);
+  src.start(); rainNode=src;
+}
+
+function playRain(intensity=0.15){ if(!audioCtx) initAudio(); rainGain.gain.setTargetAtTime(intensity, audioCtx.currentTime, 0.3); }
+function stopRain(){ if(!audioCtx) return; rainGain.gain.setTargetAtTime(0.001, audioCtx.currentTime, 0.3); }
+
+function playThunder(){
+  if(!audioCtx) initAudio();
+  const dur=1.5;
+  const buf=audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<ch.length;i++){
+    const t=i/audioCtx.sampleRate;
+    ch[i]=(Math.random()*2-1)*Math.exp(-2*t)*0.6;
+  }
+  const src=audioCtx.createBufferSource(); src.buffer=buf;
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1000;
+  src.connect(lp).connect(audioCtx.destination); src.start();
+}
+
+let audioUnlocked=false;
+function unlockAudioOnce(){
+  if(audioUnlocked) return;
+  audioUnlocked=true; initAudio();
+  window.removeEventListener('mousemove',unlockAudioOnce);
+  window.removeEventListener('keydown',unlockAudioOnce);
+  window.removeEventListener('touchstart',unlockAudioOnce);
+}
+window.addEventListener('mousemove',unlockAudioOnce);
+window.addEventListener('keydown',unlockAudioOnce);
+window.addEventListener('touchstart',unlockAudioOnce);
+
+// ---------- Visuals ----------
+let thunderTimer=null;
+function clearAnimations(){
+  document.getElementById('clouds').innerHTML='';
+  document.getElementById('rain').innerHTML='';
+  document.getElementById('sun').style.display='none';
+  stopRain();
+  if(thunderTimer){ clearInterval(thunderTimer); thunderTimer=null; }
+  document.getElementById('flash').style.opacity=0;
+}
+
+function createClouds(count=4){ 
+  const clouds=document.getElementById('clouds'); 
+  for(let i=0;i<count;i++){
+    const c=document.createElement('div'); c.className='cloud';
+    c.style.top=`${20+i*50}px`;
+    c.style.width=`${80+Math.random()*60}px`; c.style.height=`${50+Math.random()*40}px`;
+    c.style.animationDuration=`${25+Math.random()*20}s`; clouds.appendChild(c);
+  }
+}
+
+function createRain(dropCount=50){ 
+  const rain=document.getElementById('rain'); rain.innerHTML='';
+  for(let i=0;i<dropCount;i++){
+    const d=document.createElement('div'); d.className='rain-drop';
+    d.style.left=`${Math.random()*100}%`;
+    d.style.height=`${10+Math.random()*20}px`;
+    d.style.opacity=`${0.3+Math.random()*0.6}`;
+    d.style.animationDuration=`${0.8+Math.random()*0.7}s`;
+    rain.appendChild(d);
+  }
+}
+
+// ---------- Cinematic Lightning ----------
+function flashLightning(){
+  const f=document.getElementById('flash');
+  const intensity=0.2+Math.random()*0.4;
+  f.style.transition='opacity 0.05s ease';
+  f.style.opacity=intensity;
+  if(intensity>0.4) playThunder();
+  const flickCount=Math.floor(Math.random()*3);
+  for(let i=0;i<flickCount;i++){
+    setTimeout(()=>{
+      f.style.opacity=0.1+Math.random()*0.2;
+      setTimeout(()=>f.style.opacity=0,50+Math.random()*100);
+    },50+Math.random()*200);
+  }
+  setTimeout(()=>f.style.opacity=0,150+Math.random()*200);
+}
+
+function startStorm(){
+  clearAnimations();
+  createClouds(6);
+  createRain(70);
+  playRain(0.2);
+  if(thunderTimer) clearInterval(thunderTimer);
+  thunderTimer=setInterval(()=>{
+    if(Math.random()<0.7) flashLightning();
+  },800+Math.random()*1000);
+}
+
+// ---------- Autocomplete ----------
+let autoTimeout;
+const input=document.getElementById('cityInput');
+const sug=document.getElementById('suggestions');
+input.addEventListener('input',()=>{
+  clearTimeout(autoTimeout);
+  const val=input.value.trim(); if(!val){ sug.style.display='none'; return; }
+  autoTimeout=setTimeout(async()=>{
+    try{
+      const resp=await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(val)}&country=India&format=json&limit=5`);
+      const data=await resp.json(); sug.innerHTML='';
+      data.forEach(d=>{
+        const n=(d.display_name||'').split(',')[0]||'Unknown';
+        const div=document.createElement('div'); div.textContent=n;
+        div.onclick=()=>{ input.value=n; sug.style.display='none'; };
+        sug.appendChild(div);
+      });
+      sug.style.display=data.length?'block':'none';
+    }catch(e){sug.style.display='none'}
+  },300);
+});
+
+// ---------- Weather ----------
+async function getWeather(){
+  const cityVal=input.value.trim();
+  if(!cityVal) return alert('Enter city name');
+  try{
+    const coordResp=await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(cityVal)}&country=India&format=json&limit=5`);
+    const coordData=await coordResp.json(); if(!coordData.length) throw new Error('City not found');
+    const {lat,lon}=coordData[0]; const name=(coordData[0].display_name||'').split(',')[0]||cityVal;
+    const wResp=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+    const w=wResp.ok?await wResp.json():{};
+    const cw=w.current_weather||{}; const temp=cw.temperature??'—'; const wind=cw.windspeed??'—'; const code=cw.weathercode??0;
+
+    document.getElementById('weatherResult').style.display='block';
+    document.getElementById('cityName').innerText=name;
+
+    let description="Clear"; let bg="linear-gradient(to top,#4facfe,#00f2fe)";
+    clearAnimations();
+
+    if([0].includes(code)){ 
+      description="Clear"; bg="linear-gradient(to top,#fceabb,#f8b500)"; document.getElementById('sun').style.display='block'; 
+    }
+    else if([1,2,3].includes(code)){ 
+      description="Cloudy"; bg="linear-gradient(to top,#bdc3c7,#2c3e50)"; createClouds(4); 
+    }
+    else if([61].includes(code)){ 
+      description="Light Rain"; bg="linear-gradient(to top,#4b79a1,#283e51)"; createClouds(5); createRain(40); playRain(0.12); 
+    }
+    else if([63,65,80,81,82].includes(code)){ 
+      description="Rainy"; bg="linear-gradient(to top,#4b79a1,#283e51)"; createClouds(5); createRain(60); playRain(0.18); 
+    }
+    else if([95,96,99].includes(code)){ 
+      description="Stormy"; bg="linear-gradient(to top,#373b44,#4286f4)"; startStorm();
+    }
+
+    document.getElementById('description').innerText=description.toUpperCase();
+    document.getElementById('temperature').innerText=`Temperature: ${temp}°C`;
+    document.getElementById('wind').innerText=`Wind: ${wind} kph`;
+    document.body.style.background=bg;
+
+  }catch(err){ alert(err.message||'Something went wrong'); }
+}
+</script>
+</body>
 </html>

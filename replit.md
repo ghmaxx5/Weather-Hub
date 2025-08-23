@@ -1,6 +1,6 @@
 # Overview
 
-This is a modern full-stack web application built with React and Express, featuring a clean landing page with multiple sections (hero, features, about, contact). The application follows a monorepo structure with shared types and database schemas, using TypeScript throughout. It's designed as a responsive web template with modern UI components and interactive features.
+This is a Weather Hub application - a Progressive Web App (PWA) that provides real-time weather information for Indian cities with beautiful animations and sound effects. The app features animated backgrounds, weather-based visual effects (clouds, rain, sun, lightning), city autocomplete, and immersive audio. It's fully configured for Play Store deployment as a PWA.
 
 # User Preferences
 
@@ -8,21 +8,20 @@ Preferred communication style: Simple, everyday language.
 
 # System Architecture
 
-## Frontend Architecture
-- **React 18** with TypeScript for the client-side application
-- **Vite** as the build tool and development server
-- **shadcn/ui** component library built on Radix UI primitives for accessible, customizable components
-- **Tailwind CSS** for styling with CSS variables for theming
-- **Wouter** for lightweight client-side routing
-- **TanStack Query** for server state management and data fetching
-- **React Hook Form** with Zod validation for form handling
+## Application Architecture
+**Weather Hub PWA** - Standalone Progressive Web App
+- **Main App**: `/weather.html` - Complete weather application with animations
+- **PWA Features**: Service worker, app manifest, offline functionality
+- **Vanilla JavaScript**: No framework dependencies for optimal performance
+- **Real-time APIs**: OpenWeatherMap integration for weather data
+- **City Search**: Autocomplete using Nominatim OpenStreetMap API
 
-The frontend follows a component-based architecture with:
-- Reusable UI components in `/components/ui/`
-- Feature-specific components in `/components/`
-- Page components in `/pages/`
-- Custom hooks in `/hooks/`
-- Utilities and configurations in `/lib/`
+## Key Features
+- **Weather Animations**: Dynamic clouds, rain, sun, lightning effects
+- **Sound Effects**: Immersive audio for rain and thunder
+- **Indian Cities Focus**: Optimized for Indian weather locations
+- **Mobile-Ready**: Responsive design for all screen sizes
+- **Offline Capable**: PWA features for Play Store deployment
 
 ## Backend Architecture
 - **Express.js** server with TypeScript

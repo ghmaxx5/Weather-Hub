@@ -4,7 +4,7 @@
   "description": "Get real-time weather information for Indian cities with beautiful animations and sound effects",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait-primary",
   "background_color": "#4facfe",
   "theme_color": "#4facfe",
@@ -12,6 +12,7 @@
   "dir": "ltr",
   "categories": ["weather", "utilities"],
   "prefer_related_applications": false,
+  "display_override": ["fullscreen", "standalone"],
   "icons": [
     {
       "src": "./icons/icon-192x192.png",

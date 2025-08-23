@@ -1,5 +1,3 @@
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./index.css";
-
-createRoot(document.getElementById("root")!).render(<App />);
+// Weather app is served directly from index.html
+// No React needed
+console.log('Weather Hub app loaded');

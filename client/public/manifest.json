@@ -1,7 +1,7 @@
 {
-  "name": "Modern Web Template",
-  "short_name": "WebTemplate",
-  "description": "A clean, responsive, and modern web template with semantic structure and interactive components",
+  "name": "Weather Hub - Indian Cities",
+  "short_name": "Weather Hub",
+  "description": "Get real-time weather information for Indian cities with beautiful animations and sound effects",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

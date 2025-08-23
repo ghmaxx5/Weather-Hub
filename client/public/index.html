@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Hub - Indian Cities Weather App</title>
+<meta name="description" content="Get real-time weather information for Indian cities with beautiful animations and sound effects">
+
+<!-- PWA Configuration -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#4facfe">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Weather Hub">
+
+<!-- Icons -->
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+<link rel="icon" type="image/png" href="/icons/icon-192x192.png">
+
+<script>
+// Redirect to weather app
+window.location.href = '/weather.html';
+</script>
+</head>
+<body>
+<h1>Weather Hub</h1>
+<p>Redirecting to weather app...</p>
+<a href="/weather.html">Click here if not redirected</a>
+
+<script>
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+</script>
+</body>
+</html>

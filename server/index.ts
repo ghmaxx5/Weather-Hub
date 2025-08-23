@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -38,6 +39,14 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+
+  // Serve PWA files before Vite takes over
+  app.use(express.static('client/public'));
+  
+  // Serve root as weather app for PWABuilder
+  app.get('/', (_req, res) => {
+    res.sendFile(path.resolve('client/public/weather.html'));
+  });
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

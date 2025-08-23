@@ -2,7 +2,7 @@
   "name": "Weather Hub - Indian Cities Weather App",
   "short_name": "Weather Hub",
   "description": "Get real-time weather information for Indian cities with beautiful animations and sound effects",
-  "start_url": "/weather.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

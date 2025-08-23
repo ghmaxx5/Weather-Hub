@@ -1,9 +1,13 @@
-const CACHE_NAME = 'modern-web-template-v1';
+const CACHE_NAME = 'weather-hub-v2';
 const urlsToCache = [
-  '/',
-  '/src/main.tsx',
-  '/src/index.css',
-  '/manifest.json'
+  '/weather.html',
+  '/manifest.json',
+  '/icons/icon-72x72.png',
+  '/icons/icon-144x144.png',
+  '/icons/icon-152x152.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/favicon-32.ico'
 ];
 
 // Install event - cache resources
@@ -14,6 +18,7 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
 // Fetch event - serve from cache when offline
@@ -41,4 +46,5 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });

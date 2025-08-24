@@ -468,7 +468,7 @@ function initAudio() {
   const rainBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
   const rainData = rainBuf.getChannelData(0);
   for (let i = 0; i < rainData.length; i++) {
-    rainData[i] = (Math.random() * 2 - 1) * 0.15;
+    rainData[i] = (Math.random() * 2 - 1) * 0.25;
   }
 
   const rainSrc = audioCtx.createBufferSource();
@@ -487,7 +487,7 @@ function initAudio() {
   const windBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 3, audioCtx.sampleRate);
   const windData = windBuf.getChannelData(0);
   for (let i = 0; i < windData.length; i++) {
-    windData[i] = (Math.random() * 2 - 1) * 0.1 * Math.sin(i * 0.001);
+    windData[i] = (Math.random() * 2 - 1) * 0.2 * Math.sin(i * 0.001);
   }
 
   const windSrc = audioCtx.createBufferSource();
@@ -503,7 +503,7 @@ function initAudio() {
   windNode = windSrc;
 }
 
-function playRain(intensity = 0.1) {
+function playRain(intensity = 0.3) {
   if (!audioCtx) initAudio();
   rainGain.gain.setTargetAtTime(intensity, audioCtx.currentTime, 0.5);
 }
@@ -513,7 +513,7 @@ function stopRain() {
   rainGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
 }
 
-function playWind(intensity = 0.05) {
+function playWind(intensity = 0.15) {
   if (!audioCtx) initAudio();
   windGain.gain.setTargetAtTime(intensity, audioCtx.currentTime, 0.8);
 }
@@ -530,7 +530,7 @@ function playThunder() {
   const ch = buf.getChannelData(0);
   for (let i = 0; i < ch.length; i++) {
     const t = i / audioCtx.sampleRate;
-    ch[i] = (Math.random() * 2 - 1) * Math.exp(-1.5 * t) * 0.7;
+    ch[i] = (Math.random() * 2 - 1) * Math.exp(-1.5 * t) * 1.2;
   }
   const src = audioCtx.createBufferSource();
   src.buffer = buf;
@@ -538,7 +538,7 @@ function playThunder() {
   lp.type = 'lowpass';
   lp.frequency.value = 1200;
   const gain = audioCtx.createGain();
-  gain.gain.value = 0.6;
+  gain.gain.value = 0.9;
   src.connect(lp).connect(gain).connect(audioCtx.destination);
   src.start();
 }
@@ -678,8 +678,8 @@ function startStorm() {
   clearAnimations();
   createEnhancedClouds(8);
   createEnhancedRain(150);
-  playRain(0.25);
-  playWind(0.1);
+  playRain(0.7);
+  playWind(0.25);
   
   const stormTimer = setInterval(() => {
     if (Math.random() < 0.6) {
@@ -807,14 +807,14 @@ async function getWeather() {
       background = weatherBackgrounds.rainy;
       createEnhancedClouds(6);
       createEnhancedRain(80);
-      playRain(0.15);
+      playRain(0.4);
     } else if ([65, 80, 81, 82].includes(weatherCode)) {
       description = "🌧️ Heavy Rain";
       background = weatherBackgrounds.rainy;
       createEnhancedClouds(7);
       createEnhancedRain(120);
-      playRain(0.25);
-      playWind(0.08);
+      playRain(0.6);
+      playWind(0.2);
     } else if ([71, 73, 75, 85, 86].includes(weatherCode)) {
       description = "❄️ Snowy";
       background = weatherBackgrounds.snowy;
@@ -861,7 +861,7 @@ if ('serviceWorker' in navigator) {
 // Initialize with a beautiful default animation
 window.addEventListener('load', () => {
   createEnhancedClouds(3);
-  playWind(0.02);
+  playWind(0.08);
 });
 </script>
 </body>

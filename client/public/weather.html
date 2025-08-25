@@ -870,17 +870,19 @@ input.addEventListener('input', () => {
         suggestions.style.display = 'block';
       }
       
-      // Then try online API as enhancement (with timeout)
+      // Then try online API as enhancement (with longer timeout)
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(value)}&country=India&format=json&limit=3&addressdetails=1`,
           { 
             signal: controller.signal,
             headers: {
-              'User-Agent': 'WeatherHub/1.0'
+              'User-Agent': 'WeatherHub/1.0',
+              'Accept': 'application/json',
+              'Referer': window.location.href
             }
           }
         );
@@ -888,6 +890,7 @@ input.addEventListener('input', () => {
         
         if (response.ok) {
           const data = await response.json();
+          console.log('✅ Online search successful:', data.length, 'results');
           
           // Add online results if they're different from offline ones
           data.forEach(item => {
@@ -911,7 +914,10 @@ input.addEventListener('input', () => {
         }
       } catch (onlineError) {
         // Online search failed, but we have offline results
-        console.log('Online search unavailable, using offline data');
+        console.log('❌ Online search failed:', onlineError.message || onlineError.name);
+        if (onlineError.name === 'AbortError') {
+          console.log('🕐 Search timeout after 8 seconds');
+        }
       }
       
       // If no results at all, show message
@@ -981,7 +987,11 @@ async function getWeather() {
           
           const response = await fetch(api.url, {
             signal: controller.signal,
-            headers: api.headers
+            headers: {
+              ...api.headers,
+              'Accept': 'application/json',
+              'Referer': window.location.href
+            }
           });
           clearTimeout(timeoutId);
           
@@ -993,7 +1003,7 @@ async function getWeather() {
             }
           }
         } catch (apiError) {
-          console.log(`Geocoding API failed: ${api.url}`);
+          console.log(`❌ Geocoding API failed: ${api.url} - ${apiError.message}`);
           continue;
         }
       }
@@ -1025,7 +1035,9 @@ async function getWeather() {
         const response = await fetch(weatherAPI, {
           signal: controller.signal,
           headers: {
-            'User-Agent': 'WeatherHub/1.0'
+            'User-Agent': 'WeatherHub/1.0',
+            'Accept': 'application/json',
+            'Referer': window.location.href
           }
         });
         clearTimeout(timeoutId);
@@ -1048,7 +1060,7 @@ async function getWeather() {
           }
         }
       } catch (apiError) {
-        console.log(`Weather API failed: ${weatherAPI}`);
+        console.log(`❌ Weather API failed: ${weatherAPI} - ${apiError.message}`);
         continue;
       }
     }

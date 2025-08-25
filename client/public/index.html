@@ -875,22 +875,43 @@ input.addEventListener('input', () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
         
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(value)}&country=India&format=json&limit=3&addressdetails=1`,
-          { 
-            signal: controller.signal,
-            headers: {
-              'User-Agent': 'WeatherHub/1.0',
-              'Accept': 'application/json',
-              'Referer': window.location.href
+        // Try multiple search approaches
+        const searchUrls = [
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&countrycodes=in&format=json&limit=3&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(value)}&country=India&format=json&limit=3&addressdetails=1`
+        ];
+        
+        let response = null;
+        let data = [];
+        
+        for (const searchUrl of searchUrls) {
+          try {
+            response = await fetch(searchUrl, { 
+              signal: controller.signal,
+              headers: {
+                'User-Agent': 'WeatherHub/1.0',
+                'Accept': 'application/json',
+                'Referer': window.location.href
+              }
+            });
+            
+            if (response.ok) {
+              const tempData = await response.json();
+              if (tempData && tempData.length > 0) {
+                data = tempData;
+                console.log('✅ Online search successful with:', searchUrl);
+                break;
+              }
             }
+          } catch (searchError) {
+            console.log('🔄 Trying next search method...');
+            continue;
           }
-        );
+        }
         clearTimeout(timeoutId);
         
-        if (response.ok) {
-          const data = await response.json();
-          console.log('✅ Online search successful:', data.length, 'results');
+        if (data && data.length > 0) {
+          console.log('✅ Online search found:', data.length, 'results');
           
           // Add online results if they're different from offline ones
           data.forEach(item => {
@@ -911,6 +932,8 @@ input.addEventListener('input', () => {
           });
           
           suggestions.style.display = suggestions.children.length > 0 ? 'block' : 'none';
+        } else {
+          console.log('🔍 No online results found for:', value);
         }
       } catch (onlineError) {
         // Online search failed, but we have offline results

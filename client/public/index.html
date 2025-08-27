@@ -24,6 +24,11 @@
 <meta property="og:type" content="website" />
 <meta property="og:image" content="/icons/icon-512x512.png" />
 
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"
+     crossorigin="anonymous"></script>
+<meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXXX">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { 
@@ -429,11 +434,86 @@ input:focus {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Ad Styling */
+.ad-container {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 6;
+}
+
+.ad-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.banner-ad {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-ad {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.native-ad {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+/* Ad responsive design */
+@media (max-width: 480px) {
+  .ad-container {
+    margin: 15px 0;
+    padding: 12px;
+  }
+  
+  .banner-ad {
+    min-height: 80px;
+  }
+  
+  .square-ad {
+    min-height: 200px;
+  }
+}
 </style>
 </head>
 <body>
 <div class="container">
   <h1>Weather Hub</h1>
+  
+  <!-- Top Banner Ad -->
+  <div class="ad-container">
+    <div class="ad-label">Advertisement</div>
+    <div class="banner-ad">
+      <!-- Google AdSense Banner Ad -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+  </div>
+
   <div class="search-container">
     <input type="text" id="cityInput" placeholder="🌍 Enter Indian city name..." autocomplete="off">
     <div id="suggestions"></div>
@@ -446,6 +526,30 @@ input:focus {
     <p id="temperature"></p>
     <p id="wind"></p>
     <p id="humidity"></p>
+    
+    <!-- Native Ad within weather card -->
+    <div class="native-ad">
+      <div class="ad-label">Sponsored</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-format="fluid"
+           data-ad-layout-key="-gw-3+1f-3d+2z"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"></ins>
+    </div>
+  </div>
+  
+  <!-- Bottom Square/Rectangle Ad -->
+  <div class="ad-container">
+    <div class="ad-label">Advertisement</div>
+    <div class="square-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
   </div>
 </div>
 
@@ -849,6 +953,18 @@ input.addEventListener('keypress', (e) => {
   }
 });
 
+// Initialize AdSense
+function initializeAds() {
+  try {
+    // Initialize all AdSense ads on the page
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {
+    console.log('AdSense initialization error:', e);
+  }
+}
+
 // PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -858,10 +974,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Initialize with a beautiful default animation
+// Initialize with a beautiful default animation and ads
 window.addEventListener('load', () => {
   createEnhancedClouds(3);
   playWind(0.08);
+  
+  // Initialize ads after a short delay
+  setTimeout(initializeAds, 1000);
 });
 </script>
 </body>

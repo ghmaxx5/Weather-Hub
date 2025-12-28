@@ -6,8 +6,7 @@ const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/sw.js',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap'
+  '/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {

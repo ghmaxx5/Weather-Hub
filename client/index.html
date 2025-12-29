@@ -980,7 +980,44 @@ function initializeAds() {
   }
 }
 
-// PWA Service Worker Registration
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      window.deferredPrompt = e;
+      console.log('👍 beforeinstallprompt fired');
+      
+      // Optionally show your own install UI
+      const installBtn = document.createElement('button');
+      installBtn.id = 'installBtn';
+      installBtn.textContent = '📲 Install App';
+      installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:100;padding:12px 20px;border-radius:50px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;box-shadow:0 4px 15px rgba(0,0,0,0.3);font-weight:bold;cursor:pointer;';
+      document.body.appendChild(installBtn);
+      
+      installBtn.addEventListener('click', (e) => {
+        // Show the prompt
+        window.deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          window.deferredPrompt = null;
+          installBtn.remove();
+        });
+      });
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('A2HS installed');
+      if (document.getElementById('installBtn')) {
+        document.getElementById('installBtn').remove();
+      }
+    });
+
+    // PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')

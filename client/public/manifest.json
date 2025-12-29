@@ -5,14 +5,8 @@
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#4facfe",
   "theme_color": "#4facfe",
-  "lang": "en",
-  "dir": "ltr",
-  "categories": ["weather", "utilities"],
-  "prefer_related_applications": false,
-  "display_override": ["fullscreen", "standalone"],
   "icons": [
     {
       "src": "/icons/icon-192x192.png",

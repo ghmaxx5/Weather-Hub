@@ -980,41 +980,52 @@ function initializeAds() {
   }
 }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      window.deferredPrompt = e;
-      console.log('👍 beforeinstallprompt fired');
+    // PWA Debugging and Manual Prompt
+    window.addEventListener('load', () => {
+      console.log('Page loaded, checking PWA status...');
+      showInstallButton();
+    });
+
+    function showInstallButton() {
+      if (document.getElementById('installBtn')) return;
       
-      // Optionally show your own install UI
       const installBtn = document.createElement('button');
       installBtn.id = 'installBtn';
       installBtn.textContent = '📲 Install App';
-      installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:100;padding:12px 20px;border-radius:50px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;box-shadow:0 4px 15px rgba(0,0,0,0.3);font-weight:bold;cursor:pointer;';
+      installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:15px 25px;border-radius:50px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);font-weight:bold;cursor:pointer;font-size:16px;animation: bounce 2s infinite;';
+      
+      const style = document.createElement('style');
+      style.textContent = '@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }';
+      document.head.appendChild(style);
+      
       document.body.appendChild(installBtn);
       
-      installBtn.addEventListener('click', (e) => {
-        // Show the prompt
+      installBtn.addEventListener('click', () => {
+        if (!window.deferredPrompt) {
+          alert('To install: \n\n1. Tap the browser menu (3 dots) \n2. Select "Add to Home Screen" or "Install App"');
+          return;
+        }
         window.deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
         window.deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the A2HS prompt');
-          } else {
-            console.log('User dismissed the A2HS prompt');
           }
           window.deferredPrompt = null;
           installBtn.remove();
         });
       });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      console.log('👍 beforeinstallprompt fired');
     });
 
     window.addEventListener('appinstalled', (evt) => {
       console.log('A2HS installed');
-      if (document.getElementById('installBtn')) {
-        document.getElementById('installBtn').remove();
-      }
+      const btn = document.getElementById('installBtn');
+      if (btn) btn.remove();
     });
 
     // PWA Service Worker Registration

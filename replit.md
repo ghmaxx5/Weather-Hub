@@ -11,7 +11,7 @@ Preferred communication style: Simple, everyday language.
 ## Application Architecture
 **Weather Hub PWA** - Standalone Progressive Web App
 - **Main App**: `/weather.html` - Complete weather application with animations
-- **PWA Features**: Service worker, app manifest, offline functionality, custom install prompt
+- **AdSense Configuration**: Verified publisher ID, custom ad slots, and `ads.txt` implemented
 - **Display Mode**: Switched to `standalone` for better PWA compatibility
 - **Vanilla JavaScript**: No framework dependencies for optimal performance
 - **Real-time APIs**: OpenWeatherMap integration for weather data

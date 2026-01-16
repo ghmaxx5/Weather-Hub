@@ -1022,7 +1022,10 @@ function initializeAds() {
       
       installBtn.addEventListener('click', () => {
         if (!window.deferredPrompt) {
-          alert('To install: \n\n1. Tap the browser menu (3 dots) \n2. Select "Add to Home Screen" or "Install App"');
+          // Open a new tab to PWABuilder to help the user generate an APK
+          if (confirm('Direct browser installation is blocked by Netlify/Browser settings. \n\nWould you like to use PWABuilder to generate a Play Store APK instead?')) {
+            window.open('https://www.pwabuilder.com/?url=' + encodeURIComponent(window.location.href), '_blank');
+          }
           return;
         }
         window.deferredPrompt.prompt();

@@ -1040,13 +1040,7 @@ function initializeAds() {
       e.preventDefault();
       window.deferredPrompt = e;
       console.log('👍 beforeinstallprompt fired');
-      
-      // Update UI to show we are ready to install
-      const btn = document.getElementById('installBtn');
-      if (btn) {
-        btn.style.background = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
-        btn.textContent = '📲 Install Now';
-      }
+      showInstallButton();
     });
 
     window.addEventListener('appinstalled', (evt) => {

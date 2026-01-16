@@ -1000,58 +1000,6 @@ function initializeAds() {
   }
 }
 
-    // PWA Debugging and Manual Prompt
-    window.addEventListener('load', () => {
-      console.log('Page loaded, checking PWA status...');
-      showInstallButton();
-    });
-
-    function showInstallButton() {
-      if (document.getElementById('installBtn')) return;
-      
-      const installBtn = document.createElement('button');
-      installBtn.id = 'installBtn';
-      installBtn.textContent = '📲 Install App';
-      installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:15px 25px;border-radius:50px;background:linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);color:white;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);font-weight:bold;cursor:pointer;font-size:16px;animation: bounce 2s infinite;';
-      
-      const style = document.createElement('style');
-      style.textContent = '@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }';
-      document.head.appendChild(style);
-      
-      document.body.appendChild(installBtn);
-      
-      installBtn.addEventListener('click', () => {
-        if (!window.deferredPrompt) {
-          // Open a new tab to PWABuilder to help the user generate an APK
-          if (confirm('Direct browser installation is blocked by Netlify/Browser settings. \n\nWould you like to use PWABuilder to generate a Play Store APK instead?')) {
-            window.open('https://www.pwabuilder.com/?url=' + encodeURIComponent(window.location.href), '_blank');
-          }
-          return;
-        }
-        window.deferredPrompt.prompt();
-        window.deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the A2HS prompt');
-          }
-          window.deferredPrompt = null;
-          installBtn.remove();
-        });
-      });
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('👍 beforeinstallprompt fired');
-      e.preventDefault();
-      window.deferredPrompt = e;
-      showInstallButton();
-    });
-
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('A2HS installed');
-      const btn = document.getElementById('installBtn');
-      if (btn) btn.remove();
-    });
-
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1059,15 +1007,6 @@ function initializeAds() {
         navigator.serviceWorker.register('sw.js')
           .then(registration => {
             console.log('🚀 SW registered:', registration);
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New SW version available');
-                }
-              });
-            });
           })
           .catch(error => console.log('❌ SW registration failed:', error));
       });

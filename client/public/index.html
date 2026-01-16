@@ -1004,7 +1004,7 @@ function initializeAds() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         // Use a relative path without leading slash for Netlify
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('/sw.js')
           .then(registration => {
             console.log('🚀 SW registered:', registration);
           })
